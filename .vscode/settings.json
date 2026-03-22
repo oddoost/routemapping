@@ -1,0 +1,7 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "npm install": true,
+        "true": true,
+        "npx tsc": true
+    }
+}
