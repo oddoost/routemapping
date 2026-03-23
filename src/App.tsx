@@ -31,6 +31,7 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<{}>, { error
 
 export default function App() {
   const load = useFlowStore((s) => s.load)
+  const loadFromShare = useFlowStore((s) => s.loadFromShare)
   const title = useFlowStore((s) => s.title)
   const setTitle = useFlowStore((s) => s.setTitle)
   const description = useFlowStore((s) => s.description)
@@ -52,8 +53,22 @@ export default function App() {
   const footerRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    load()
-  }, [load])
+    // Check for shared data in URL
+    const params = new URLSearchParams(window.location.search)
+    const shareData = params.get('share')
+    
+    if (shareData) {
+      try {
+        const decoded = JSON.parse(atob(shareData))
+        loadFromShare(decoded)
+      } catch (err) {
+        console.error('Error loading shared data:', err)
+        load() // Fall back to normal load
+      }
+    } else {
+      load()
+    }
+  }, [load, loadFromShare])
 
   useEffect(() => {
     if (editingTitle) {

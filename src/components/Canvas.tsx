@@ -31,6 +31,7 @@ export default function Canvas() {
   const addEdgeStore = useFlowStore((s) => s.addEdge)
   const exportJSON = useFlowStore((s) => s.exportJSON)
   const importJSON = useFlowStore((s) => s.importJSON)
+  const generateShareLink = useFlowStore((s) => s.generateShareLink)
   const undo = useFlowStore((s) => s.undo)
   const redo = useFlowStore((s) => s.redo)
   const snapshot = useFlowStore((s) => s.snapshot)
@@ -298,12 +299,55 @@ export default function Canvas() {
     }
   }
 
+  function handleShareClick() {
+    try {
+      generateShareLink()
+    } catch (err) {
+      console.error('share error', err)
+      alert('Error generating share link — see console')
+    }
+  }
+
   function handleImportClick() {
     try {
       importJSON()
     } catch (err) {
       console.error('importJSON error', err)
       alert('Error importing — see console')
+    }
+  }
+
+  async function handleScreenshot() {
+    try {
+      // Call the Puppeteer screenshot server
+      const response = await fetch('http://localhost:3001/screenshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: window.location.href,
+          scale: 8,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Screenshot server error');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Download the screenshot
+        const link = document.createElement('a');
+        link.href = `http://localhost:3001/screenshot/${data.filename}`;
+        link.download = data.filename;
+        link.click();
+        alert('Screenshot captured successfully!');
+      } else {
+        throw new Error(data.error || 'Failed to capture screenshot');
+      }
+    } catch (err) {
+      console.error('screenshot error:', err);
+      alert('Make sure the screenshot server is running: node screenshot-server.js');
     }
   }
 
@@ -486,6 +530,16 @@ export default function Canvas() {
                 </svg>
               </button>
 
+              <button onClick={handleShareClick} className="icon-btn" title="Generate Share Link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </button>
+
               <button onClick={() => toggleShowOutline()} className={`icon-btn ${showOutline ? 'bg-white/20' : ''}`} title="Toggle Outline">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -512,6 +566,13 @@ export default function Canvas() {
               <div className="w-full h-px bg-white/10 my-1" />
             </>
           )}
+
+          <button onClick={handleScreenshot} className="icon-btn" title="Take Screenshot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>
 
           <button onClick={() => rfInstanceRef.current?.zoomIn({ duration: 200 })} className="icon-btn" title="Zoom In">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

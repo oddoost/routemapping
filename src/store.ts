@@ -77,6 +77,8 @@ type FlowState = {
   snapshot: () => void
   enableDragSelected: (id: string) => void
   disableDragAll: () => void
+  generateShareLink: () => string
+  loadFromShare: (data: any) => void
 }
 
 export const useFlowStore = create<FlowState>((set, get) => ({
@@ -255,6 +257,42 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     set((s) => ({
       nodes: s.nodes.map((n) => n.draggable ? { ...n, draggable: false } : n)
     }))
+  },
+  generateShareLink: () => {
+    const state = get()
+    const data = {
+      nodes: state.nodes,
+      edges: state.edges,
+      title: state.title,
+      description: state.description,
+      links: state.links,
+      footerText: state.footerText,
+    }
+    const encoded = btoa(JSON.stringify(data))
+    const url = `${window.location.origin}${window.location.pathname}?share=${encoded}`
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Shareable link copied to clipboard!')
+    }).catch(() => {
+      prompt('Copy this link:', url)
+    })
+    
+    return url
+  },
+  loadFromShare: (data: any) => {
+    try {
+      set({
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        title: data.title || 'Shared Canvas',
+        description: data.description || '',
+        links: data.links || [],
+        footerText: data.footerText || '',
+      })
+    } catch (err) {
+      console.error('Error loading shared data:', err)
+    }
   }
 }))
 
