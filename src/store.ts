@@ -1,6 +1,7 @@
 import create from 'zustand'
 import { Node, Edge } from 'reactflow'
 import { saveFlowToDB, loadFlowFromDB } from './db'
+import routeMapping from '../ROUTE_MAPPING.json'
 
 type Snapshot = {
   nodes: Node[]
@@ -131,7 +132,8 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     await saveFlowToDB({ nodes, edges, title, description, descSize, links, footerText })
   },
   load: async () => {
-    const loaded = await loadFlowFromDB()
+    // Load from ROUTE_MAPPING.json by default
+    const loaded = routeMapping as any
     if (loaded) {
       // Valid handle IDs for current node setup
       const validHandleIds = new Set([undefined, null, '', 'left-src', 'left-tgt', 'right-src', 'right-tgt'])
