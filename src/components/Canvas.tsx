@@ -354,6 +354,15 @@ export default function Canvas() {
   // Copy / Paste keyboard handler
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      // Exit fullscreen on 'x' key
+      if (e.key === 'x' || e.key === 'X') {
+        if (document.fullscreenElement) {
+          e.preventDefault()
+          document.exitFullscreen()
+          return
+        }
+      }
+
       const meta = e.metaKey || e.ctrlKey
       // Don't intercept if user is typing in an input/textarea
       const tag = (e.target as HTMLElement)?.tagName
@@ -600,7 +609,7 @@ export default function Canvas() {
             </svg>
           </button>
 
-          {!(isFullscreen && lockUsedInFullscreen) && <button onClick={() => { if (isFullscreen) setLockUsedInFullscreen(true); toggleLocked() }} className={`icon-btn ${locked ? 'bg-white/20' : ''}`} title={locked ? 'Unlock' : 'Lock'}>
+          {!(isFullscreen && lockUsedInFullscreen) && !locked && <button onClick={() => { if (isFullscreen) setLockUsedInFullscreen(true); toggleLocked() }} className={`icon-btn ${locked ? 'bg-white/20' : ''}`} title={locked ? 'Unlock' : 'Lock'}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               {locked ? (
                 <>
