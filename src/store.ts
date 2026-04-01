@@ -1,7 +1,7 @@
 import create from 'zustand'
 import { Node, Edge } from 'reactflow'
 import { saveFlowToDB, loadFlowFromDB } from './db'
-import routeMapping from '../ROUTE_MAPPING.json'
+import routeMapping from '../ROUTE MAPPING_20260401.json'
 
 type Snapshot = {
   nodes: Node[]
