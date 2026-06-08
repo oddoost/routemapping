@@ -95,6 +95,24 @@ export default function Canvas() {
     return () => document.removeEventListener('fullscreenchange', onFs)
   }, [])
 
+  // When locked, request fullscreen (kiosk mode)
+  useEffect(() => {
+    if (locked) {
+      const container = document.documentElement
+      if (!document.fullscreenElement) {
+        container.requestFullscreen?.().catch((err) => {
+          console.warn('Fullscreen request failed:', err.message)
+        })
+      }
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch((err) => {
+          console.warn('Exit fullscreen failed:', err.message)
+        })
+      }
+    }
+  }, [locked])
+
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
     if (locked) return
     event.stopPropagation()
@@ -609,7 +627,7 @@ export default function Canvas() {
             </svg>
           </button>
 
-          {!(isFullscreen && lockUsedInFullscreen) && !locked && <button onClick={() => { if (isFullscreen) setLockUsedInFullscreen(true); toggleLocked() }} className={`icon-btn ${locked ? 'bg-white/20' : ''}`} title={locked ? 'Unlock' : 'Lock'}>
+          {!(isFullscreen && lockUsedInFullscreen) && <button onClick={() => { if (isFullscreen) setLockUsedInFullscreen(true); toggleLocked() }} className={`icon-btn ${locked ? 'bg-white/20' : ''}`} title={locked ? 'Unlock & Exit Fullscreen' : 'Lock & Enter Kiosk Mode'}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               {locked ? (
                 <>

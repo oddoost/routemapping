@@ -19,21 +19,21 @@ An interactive canvas application for creating visual diagrams with nodes and co
 - Node.js 16+ and npm
 - For screenshots: Puppeteer (requires Chrome/Chromium)
 
-### 1. Install Dependencies
+### Quick Start
 
 ```bash
+# 1. Install dependencies
 npm install
-```
 
-### 2. Run Development Server
-
-```bash
+# 2. Start development server
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173/routemapping/`
+The app will be available at **http://localhost:5173/**
 
-### 3. (Optional) Run Screenshot Server
+**For detailed setup instructions and troubleshooting, see [SETUP.md](./SETUP.md)**
+
+### (Optional) Run Screenshot Server
 
 For high-resolution screenshots with embedded content:
 
@@ -79,7 +79,48 @@ npm run deploy    # Deploy to GitHub Pages
 - Click the save button for immediate save
 - Export to JSON for backup or sharing
 
-## Technology Stack
+### Lock & Kiosk Mode
+- Click the **lock icon** (🔒) to lock the canvas and enter fullscreen kiosk mode
+- In kiosk mode, all editing is disabled and the canvas is read-only
+- Click the lock icon again to unlock and exit kiosk mode
+
+#### Launch in Kiosk Mode on macOS
+
+For a full-screen kiosk experience without browser UI:
+
+**Option 1: Using the app's lock button** (Recommended)
+```bash
+# Start the dev server
+npm run dev
+
+# In browser, click the lock icon to enter kiosk mode
+```
+
+**Option 2: Launch Chrome in kiosk mode**
+```bash
+# First, start the dev server in another terminal
+npm run dev
+
+# Then launch Chrome in kiosk mode (macOS)
+open -a "Google Chrome" --args --kiosk http://localhost:5173/routemapping/
+```
+
+Or with the full path:
+```bash
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --kiosk http://localhost:5173/routemapping/
+```
+
+**Option 3: For production deployment**
+```bash
+# Build the app
+npm run build
+
+# Serve the dist folder, then open in kiosk mode
+open -a "Google Chrome" --args --kiosk http://your-domain.com/routemapping/
+```
+
+**Note**: In kiosk mode, press `Esc` to exit (if enabled in Chrome settings).
+
 
 - **React 18** - UI library
 - **Vite** - Build tool and dev server
